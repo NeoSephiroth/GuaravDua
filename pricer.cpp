@@ -130,119 +130,7 @@ double Option::getRate(){ return r; }
 string Option::getType(){ return OptionType; }
 
 
-//**********************************
-//	European Call
-//**********************************
-EuropeanCall::EuropeanCall( double strike0, double spot0, double sigma, double Time, double rate ) : Option( strike0,  spot0, sigma, Time, rate )
-{
-    //  set type to European call and set the BlackScholes value
-    OptionType = "EC";
-    BSValue = BlackScholesValue();
-}
-EuropeanCall::~EuropeanCall( )
-{
-    // nothing to delete
-}
-//  Find the exact value using BS
-double EuropeanCall::BlackScholesValue( )
-{
-    return spot*calc_CumNorm(d1)-strike*exp(-r*T)*calc_CumNorm(d2);
-}
-//  numerically calculate the value from a binomial tree
-double EuropeanCall::getValue()
-{
-    double currVal;
 
-    binomialtree currOpt((*this));
-
-    return currOpt.findval();
-}
-//  Find the payout if exercised early (0 if t>0)
-double EuropeanCall::getPayout( double S, double t )
-{
-    if( t==0 )
-    {
-        double testP;
-        testP =  S - strike;
-        if (testP > 0) return testP;
-        else return 0;
-    }
-    else
-    {return 0.0;}
-}
-//**********************************
-//	European Put
-//**********************************
-EuropeanPut::EuropeanPut( double strike0, double spot0, double sigma, double Time, double rate ) : Option( strike0,  spot0, sigma, Time, rate )
-{
-    //  Type and BS value
-    OptionType = "EP";
-    BSValue = BlackScholesValue();
-}
-EuropeanPut::~EuropeanPut( )
-{
-    //  Nothing to delete
-}
-double EuropeanPut::BlackScholesValue( )
-{
-    return strike*exp(-r*T)*calc_CumNorm(-d2)-spot*calc_CumNorm(-d1);
-}
-//  Numerical calculation using binomial tree
-double EuropeanPut::getValue()
-{
-    double currVal;
-
-    binomialtree currOpt((*this));
-
-    return currOpt.findval();
-}
-//  Find the payout if exercised early (0 if t>0)
-double EuropeanPut::getPayout(double S, double t)
-{
-    if( t==0 )
-    {
-        double testP;
-        testP = strike - S;
-        if (testP > 0) return testP;
-        else return 0;
-    }
-    else
-    {return 0.0;}
-}
-//**********************************
-//	American Call
-//**********************************
-AmericanCall::AmericanCall( double strike0, double spot0, double sigma, double Time, double rate ) : Option( strike0,  spot0, sigma, Time, rate )
-{
-    // set type
-    OptionType = "AC";
-}
-AmericanCall::~AmericanCall( )
-{
-    // nothing to delete
-}
-// NOT USED
-double AmericanCall::BlackScholesValue( )
-{
-    return spot*calc_CumNorm(d1)-strike*exp(-r*T)*calc_CumNorm(d2);
-}
-double AmericanCall::getValue()
-{
-    //  get the value of the option numerically
-    double currVal;
-
-    binomialtree currOpt((*this));
-
-    return currOpt.findval();
-}
-//  Find the payout if exercised early.  In theory this will never be used
-double AmericanCall::getPayout(double S, double t)
-{
-    double testP;
-    testP =  S - strike;
-    if (testP > 0) return testP;
-    else return 0;
-}
 //**********************************
 //	American Put
 //**********************************
@@ -478,21 +366,7 @@ void ValueOptions( string inName, string outName )
         thisRate = atof(token.c_str());
 
         //  Output to the .csv file based on the option type.  add price of stock at the end.
-        if( AssetType == "EC" )
-        {
-            EuropeanCall tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
-            outFile << AssetType << "," << thisStrike << "," << thisSpot << "," << thisVix << "," << thisTime << "," << thisRate << "," << tempOption.BlackScholesValue( ) << endl;
-        }
-        if( AssetType == "EP" )
-        {
-            EuropeanPut tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
-            outFile << AssetType << "," << thisStrike << "," << thisSpot << "," << thisVix << "," << thisTime << "," << thisRate << "," << tempOption.BlackScholesValue( ) << endl;
-        }
-        if( AssetType == "AC" )
-        {
-            AmericanCall tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
-            outFile << AssetType << "," << thisStrike << "," << thisSpot << "," << thisVix << "," << thisTime << "," << thisRate << "," << tempOption.getValue( ) << endl;
-        }
+
         if( AssetType == "AP" )
         {
             AmericanPut tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
@@ -532,24 +406,7 @@ void ValueDelta( string inName, string outName )
         thisRate = atof(token.c_str());
 
         //  Output to the .csv file based on the option type.  add price of stock and value of delta at the end.
-        if( AssetType == "EC" )
-        {
-            EuropeanCall tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
-            binomialtree tempTree(tempOption);
-            outFile << AssetType << "," << thisStrike << "," << thisSpot << "," << thisVix << "," << thisTime << "," << thisRate << "," << tempOption.BlackScholesValue( ) << "," << tempTree.finddelta() << endl;
-        }
-        if( AssetType == "EP" )
-        {
-            EuropeanPut tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
-            binomialtree tempTree(tempOption);
-            outFile << AssetType << "," << thisStrike << "," << thisSpot << "," << thisVix << "," << thisTime << "," << thisRate << "," << tempOption.BlackScholesValue( ) << "," << tempTree.finddelta() << endl;
-        }
-        if( AssetType == "AC" )
-        {
-            AmericanCall tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);
-            binomialtree tempTree(tempOption);
-            outFile << AssetType << "," << thisStrike << "," << thisSpot << "," << thisVix << "," << thisTime << "," << thisRate << "," << tempOption.getValue( ) << "," << tempTree.finddelta() << endl;
-        }
+
         if( AssetType == "AP" )
         {
             AmericanPut tempOption(thisStrike,thisSpot,thisVix,thisTime,thisRate);

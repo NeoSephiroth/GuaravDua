@@ -89,69 +89,8 @@ protected:
 };
 
 
-//**********************************
-//	European Call
-//**********************************
-class EuropeanCall: public Option // inherit option
-{
-public:
-    //  European call constructors
-    EuropeanCall( double strike0, double spot0, double sigma, double Time, double rate );
-    ~EuropeanCall( );
 
-    //  Data access
-    double BlackScholesValue( );
-    double getValue();
-    double getBSValue();
-    double getPayout( double S, double t);
 
-private:
-    //  private variables
-    double BSValue;
-    double Value;
-};
-//**********************************
-//	European Put
-//**********************************
-class EuropeanPut: public Option
-{
-public:
-    //  European Put constructors
-    EuropeanPut( double strike0, double spot0, double sigma, double Time, double rate );
-    ~EuropeanPut( );
-
-    //  Data access
-    double BlackScholesValue( );
-    double getValue();
-    double getBSValue();
-    double getPayout( double S, double t);
-
-private:
-    // private variables
-    double BSValue;
-    double Value;
-};
-//**********************************
-//	American Call
-//**********************************
-
-class AmericanCall: public Option
-{
-public:
-    //  American Call constructors
-    AmericanCall( double strike0, double spot0, double sigma, double Time, double rate );
-    ~AmericanCall( );
-
-    //  Data Access
-    double BlackScholesValue( );
-    double getValue();
-    double getPayout( double S, double t );
-
-private:
-    //  private varaibles
-    double BSValue;
-    double Value;
-};
 
 //**********************************
 //	American Put
@@ -196,7 +135,7 @@ public:
     double findgamma( void );
 
 private:
-    //  Private variables and vectors
+
     double n, u, d, a, q, P0;
     double val;
     double delta, gamma;
@@ -208,11 +147,10 @@ private:
 
 
 
-//  Helper Functions
-//  Used to read tokes
+
 bool nextToken(const string& line, int& offset, string& token);
 
-//  General File access functions
+
 void ValueOptions( string inName, string outName );
 void ValueDelta( string inName, string outName );
 
